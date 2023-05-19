@@ -12,9 +12,14 @@ namespace Kalkulator
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string
-            wynik,
-            działanie
+            wynik = "0",
+            operacja = null
             ;
+        private double?
+            operandLewy = null,
+            operandPrawy = null;
+
+
 
         public string Wynik
         {
@@ -29,19 +34,108 @@ namespace Kalkulator
         }
         public string Działanie
         {
-            get => działanie;
-            set
+            get
             {
-                działanie = value;
-                PropertyChanged?.Invoke(
-                    this,
-                    new PropertyChangedEventArgs("Działanie"));
+                if (operandLewy == null)
+                    return "";
+                else if (operandPrawy == null)
+                    return $"{operandLewy} {operacja}";
+                else
+                    return $"{operandLewy} {operacja} {operandPrawy} = ";
             }
         }
 
         internal void WprowadźCyfrę(string cyfra)
         {
-            Wynik += cyfra;
+            if (wynik == "0")
+                if (cyfra == "0")
+                    return;
+                else
+                    Wynik = cyfra;
+            else
+                Wynik += cyfra;
+        }
+
+        internal void ZmieńZnak()
+        {
+            if (Wynik == "0")
+                return;
+            else if (wynik[0] == '-')
+                Wynik = wynik.Substring(1);
+            else
+                Wynik = '-' + wynik;
+
+        }
+
+        internal void CzyśćWszystko()
+        {
+            CzyśćWynik();
+            operacja = null;
+            operandLewy = operandPrawy = null;
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs("Działanie"));
+        }
+
+        internal void CzyśćWynik()
+        {
+            Wynik = "0";
+        }
+
+        internal void KasujZnak()
+        {
+            if (wynik == "0")
+                return;
+            else if (wynik.Length == 1 || wynik.Length == 2 && wynik[0] == '-' || wynik == "-0,")
+                Wynik = "0";
+            else
+                Wynik = wynik.Substring(0, wynik.Length - 1);
+        }
+
+        internal void WykonajDziałanie()
+        {
+            if (operandPrawy == null)
+                if (wynik == "0")
+                    operandPrawy = operandLewy;
+                else
+                    operandPrawy = Convert.ToDouble(wynik);
+
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs("Działanie"));
+
+            if (operacja == "+")
+                Wynik = (operandLewy + operandPrawy).ToString();
+
+            operandLewy = Convert.ToDouble(wynik);
+        }
+
+        internal void WprowadźOperacje(string operacja)
+        {
+            if (this.operacja != null)
+            {
+                WykonajDziałanie();
+                this.operacja = operacja;
+            }
+            else
+            {
+                operandLewy = Convert.ToDouble(wynik);
+                this.operacja = operacja;
+
+                PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs("Działanie"));
+            }
+
+            wynik = "0";
+        }
+
+        internal void WprowadźPrzecinek()
+        {
+            if (Wynik.Contains(','))
+                return;
+            else
+                Wynik += ",";
         }
     }
 }
