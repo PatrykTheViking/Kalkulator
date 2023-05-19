@@ -20,9 +20,17 @@ namespace Kalkulator
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Klasa1 Kalkulator { get; } = new Klasa1();
         public MainWindow()
         {
+            DataContext = Kalkulator;
             InitializeComponent();
+        }
+
+        private void Cyfra(object sender, RoutedEventArgs e)
+        {
+            string cyfra = ((Button)sender).Content.ToString();
+            Kalkulator.WprowadźCyfrę(cyfra);
         }
     }
 }
