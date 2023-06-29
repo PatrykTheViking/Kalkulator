@@ -56,9 +56,17 @@ namespace Kalkulator
                 Wynik += cyfra;
         }
 
+        internal void WprowadźPrzecinek()
+		{
+			if (wynik.Contains(','))
+				return;
+			else
+				Wynik += ',';
+		}
+
         internal void ZmieńZnak()
         {
-            if (Wynik == "0")
+            if (wynik == "0")
                 return;
             else if (wynik[0] == '-')
                 Wynik = wynik.Substring(1);
@@ -66,6 +74,20 @@ namespace Kalkulator
                 Wynik = '-' + wynik;
 
         }
+
+        internal void KasujZnak()
+		{
+			if (wynik == "0")
+				return;
+			else if (
+				wynik.Length == 1
+				|| (wynik.Length == 2 && wynik[0] == '-')
+				|| wynik == "-0,"
+				)
+				Wynik = "0";
+			else
+				Wynik = wynik.Substring(0, wynik.Length - 1);
+		}
 
         internal void CzyśćWszystko()
         {
@@ -82,33 +104,6 @@ namespace Kalkulator
             Wynik = "0";
         }
 
-        internal void KasujZnak()
-        {
-            if (wynik == "0")
-                return;
-            else if (wynik.Length == 1 || wynik.Length == 2 && wynik[0] == '-' || wynik == "-0,")
-                Wynik = "0";
-            else
-                Wynik = wynik.Substring(0, wynik.Length - 1);
-        }
-
-        internal void WykonajDziałanie()
-        {
-            if (operandPrawy == null)
-                if (wynik == "0")
-                    operandPrawy = operandLewy;
-                else
-                    operandPrawy = Convert.ToDouble(wynik);
-
-            PropertyChanged?.Invoke(
-                this,
-                new PropertyChangedEventArgs("Działanie"));
-
-            if (operacja == "+")
-                Wynik = (operandLewy + operandPrawy).ToString();
-
-            operandLewy = Convert.ToDouble(wynik);
-        }
 
         internal void WprowadźOperacje(string operacja)
         {
@@ -130,12 +125,43 @@ namespace Kalkulator
             wynik = "0";
         }
 
-        internal void WprowadźPrzecinek()
-        {
-            if (Wynik.Contains(','))
-                return;
-            else
-                Wynik += ",";
+        internal void WykonajDziałanie()
+		{
+			if (operandPrawy == null)
+				if (wynik == "0")
+					operandPrawy = operandLewy;
+				else
+					operandPrawy = Convert.ToDouble(wynik);
+			PropertyChanged?.Invoke(
+				this,
+				new PropertyChangedEventArgs("Działanie")
+				);
+			if (operandPrawy != Convert.ToDouble(Wynik)) operandPrawy = Convert.ToDouble(Wynik);
+
+			if (operacja == "+")
+				Wynik = (operandLewy + operandPrawy).ToString();
+			
+            else if (operacja == "-")
+                Wynik = (operandLewy - operandPrawy).ToString();
+            
+            else if (operacja == "*")
+                Wynik = (operandLewy * operandPrawy).ToString();
+            
+            else if (operacja == "/")
+                Wynik = (operandLewy / operandPrawy).ToString();
+
+
+            else if (operacja == "1/x")
+                Wynik = (1 / operandLewy).ToString();
+
+            else if (operacja == "x²")
+                Wynik = (operandLewy * operandLewy).ToString();
+
+            else if (operacja == "2√x")
+                Wynik = Math.Sqrt((double)operandLewy).ToString();
+
+
+            operandLewy = Convert.ToDouble(wynik);
         }
     }
 }

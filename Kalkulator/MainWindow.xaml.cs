@@ -68,5 +68,10 @@ namespace Kalkulator
         {
             Kalkulator.WykonajDziałanie();
         }
+		private void DziałanieJednoargumentowe(object sender, RoutedEventArgs e)
+		{
+			string działanie = ((Button)sender).Content.ToString();
+			Kalkulator.WprowadźOperacje(działanie);
+		}																	 
     }
 }
